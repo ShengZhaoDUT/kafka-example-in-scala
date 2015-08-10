@@ -61,10 +61,10 @@ object ScalaConsumerExample extends App {
 class ScalaConsumerTest(val stream: KafkaStream[Array[Byte], Array[Byte]], val threadNumber: Int, val delay: Long) extends Logging with Runnable {
   def run {
     val it = stream.iterator()
-    val mongoClient = MongoClient("localhost", 27017)
+    val mongoClient = MongoClient("192.168.100.2", 27017)
     val db = mongoClient("test")
     val coll = db("test")
-
+    System.out.println("mongodb connect successful")
     while (it.hasNext()) {
       val msg = new String(it.next().message());
       System.out.println(System.currentTimeMillis() + ",Thread " + threadNumber + ": " + msg);
