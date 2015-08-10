@@ -2,12 +2,14 @@ package com.colobu.kafka
 
 import java.util.Properties
 import java.util.concurrent._
+
 import scala.collection.JavaConversions._
 import kafka.consumer.Consumer
 import kafka.consumer.ConsumerConfig
 import kafka.utils._
 import kafka.utils.Logging
 import kafka.consumer.KafkaStream
+import com.mongodb.casbah.Imports._
 
 class ScalaConsumerExample(val zookeeper: String,
                             val groupId: String,
@@ -59,10 +61,15 @@ object ScalaConsumerExample extends App {
 class ScalaConsumerTest(val stream: KafkaStream[Array[Byte], Array[Byte]], val threadNumber: Int, val delay: Long) extends Logging with Runnable {
   def run {
     val it = stream.iterator()
+    val mongoClient = MongoClient("localhost", 27017)
+    val db = mongoClient("test")
+    val coll = db("test")
 
     while (it.hasNext()) {
       val msg = new String(it.next().message());
       System.out.println(System.currentTimeMillis() + ",Thread " + threadNumber + ": " + msg);
+      val a = MongoDBObject(msg -> msg)
+      coll.insert(a)
     }
 
     System.out.println("Shutting down Thread: " + threadNumber);
